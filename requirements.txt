@@ -1,0 +1,15 @@
+click
+Flask
+gunicorn
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+numpy
+Pillow
+requests
+tensorflow
+opencv-python
+seaborn
+scikit-learn
+firebase-admin
