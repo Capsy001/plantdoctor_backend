@@ -304,8 +304,13 @@ def update_data(id):
 
 @app.route('/data/<id>', methods=['DELETE'])
 def delete_data(id):
-    doc = db.collection('data').document(id).get()
-    if doc.exists:
+    # Assuming 'id' is the manually entered identifier, not the Firestore document ID
+
+    # Query Firestore to find the document with the matching 'id' field
+    data_ref = db.collection('data').where('id', '==', id).limit(1)
+
+    # Iterate through the query results (should be only one)
+    for doc in data_ref.stream():
         data = doc.to_dict()
 
         # Delete images from local storage
@@ -313,10 +318,14 @@ def delete_data(id):
         os.remove(data['image2_path'])
         os.remove(data['image3_path'])
 
-        # Delete document from Firestore
-        db.collection('data').document(id).delete()
+        # Delete the document from Firestore using the Firestore-generated document ID
+        db.collection('data').document(doc.id).delete()
 
-    return jsonify({'message': 'Data deleted successfully'}), 200
+        return jsonify({'message': 'Data deleted successfully'}), 200
+
+    # If no matching document is found, return an error
+    return jsonify({'error': 'Document not found'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
