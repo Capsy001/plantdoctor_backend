@@ -262,13 +262,14 @@ def update_data(id):
     save_path = os.path.join(UPLOAD_FOLDER, data_type, data_class)
 
     data = {
+        'id': id,  # Use the manually entered ID
         'type': data_type,
         'class': data_class,
         'topic1': request.form['topic1'],
         'description1': request.form['description1'],
         'topic2': request.form['topic2'],
         'description2': request.form['description2'],
-        'category':request.form['category']
+        'category': request.form['category']
     }
 
     if 'image1' in request.files:
@@ -286,8 +287,10 @@ def update_data(id):
         request.files['image3'].save(os.path.join(save_path, image3_filename))
         data['image3_path'] = os.path.join(save_path, image3_filename)
 
-    db.collection('data').document(id).set(data, merge=True)
+    # Update the document in Firestore using the manually entered ID
+    db.collection('data').document(id).set(data)
     return jsonify({'message': 'Data updated successfully'}), 200
+
 
 @app.route('/data/<id>', methods=['DELETE'])
 def delete_data(id):
