@@ -257,12 +257,13 @@ def get_data_by_type_and_class(data_type, data_class):
 
 @app.route('/data/<id>', methods=['PUT'])
 def update_data(id):
+    # Assuming 'id' is the manually entered identifier, not the Firestore document ID
+
     data_type = request.form['type']
     data_class = request.form['class']
     save_path = os.path.join(UPLOAD_FOLDER, data_type, data_class)
 
     data = {
-        'id': id,  # Use the manually entered ID
         'type': data_type,
         'class': data_class,
         'topic1': request.form['topic1'],
@@ -287,9 +288,18 @@ def update_data(id):
         request.files['image3'].save(os.path.join(save_path, image3_filename))
         data['image3_path'] = os.path.join(save_path, image3_filename)
 
-    # Update the document in Firestore using the manually entered ID
-    db.collection('data').document(id).set(data)
-    return jsonify({'message': 'Data updated successfully'}), 200
+    # Query Firestore to find the document with the matching 'id' field
+    data_ref = db.collection('data').where('id', '==', id).limit(1)
+
+    # Iterate through the query results (should be only one)
+    for doc in data_ref.stream():
+        # Update the document with the Firestore-generated document ID
+        db.collection('data').document(doc.id).update(data)
+        return jsonify({'message': 'Data updated successfully'}), 200
+
+    # If no matching document is found, return an error
+    return jsonify({'error': 'Document not found'}), 404
+
 
 
 @app.route('/data/<id>', methods=['DELETE'])
