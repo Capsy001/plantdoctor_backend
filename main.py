@@ -160,6 +160,7 @@ def create_data():
         'image1_path': os.path.join(save_path, image1_filename),
         'image2_path': os.path.join(save_path, image2_filename),
         'image3_path': os.path.join(save_path, image3_filename),
+        'category': request.form['category']
     }
 
     db.collection('data').add(data)
@@ -267,6 +268,7 @@ def update_data(id):
         'description1': request.form['description1'],
         'topic2': request.form['topic2'],
         'description2': request.form['description2'],
+        'category':request.form['category']
     }
 
     if 'image1' in request.files:
