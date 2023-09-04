@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify,send_file
+from flask import Flask, request, jsonify,send_file,send_from_directory
 import numpy as np
 import tensorflow as tf
 from PIL import Image
@@ -340,4 +340,5 @@ def get_image_by_filename(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
