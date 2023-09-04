@@ -131,11 +131,10 @@ def create_data():
     if 'image1' not in request.files or 'image2' not in request.files or 'image3' not in request.files:
         return jsonify({'error': 'Image files not provided'}), 400
 
-    data_type = request.form['type']
-    data_class = request.form['class']
+    # Save images in the 'images' folder
+    save_path = os.path.join(UPLOAD_FOLDER, 'images')
 
-    # Create directory structure if not exists
-    save_path = os.path.join(UPLOAD_FOLDER, data_type, data_class)
+    # Create the 'images' folder if it doesn't exist
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -148,6 +147,9 @@ def create_data():
 
     image3_filename = secure_filename(request.files['image3'].filename)
     request.files['image3'].save(os.path.join(save_path, image3_filename))
+
+    data_type = request.form['type']
+    data_class = request.form['class']
 
     data = {
         'id': request.form['id'],
@@ -165,6 +167,7 @@ def create_data():
 
     db.collection('data').add(data)
     return jsonify({'message': 'Data added successfully'}), 201
+
 
 @app.route('/data/images/<data_id>', methods=['GET'])
 def get_images_by_data_id(data_id):
@@ -325,6 +328,15 @@ def delete_data(id):
 
     # If no matching document is found, return an error
     return jsonify({'error': 'Document not found'}), 404
+    
+@app.route('/images/<filename>', methods=['GET'])
+def get_image_by_filename(filename):
+    image_path = os.path.join(UPLOAD_FOLDER, 'images', filename)  # Assuming the images are stored in the 'images' folder
+
+    if os.path.isfile(image_path):
+        return send_from_directory(os.path.join(UPLOAD_FOLDER, 'images'), filename)
+    else:
+        return jsonify({'error': 'Image not found'}), 404
 
 
 if __name__ == '__main__':
