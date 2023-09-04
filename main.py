@@ -228,13 +228,24 @@ def get_image_by_data_id(data_id, image_number):
     return jsonify({'message': 'Data not found'}), 404
 
 
-@app.route('/data/<id>', methods=['GET'])
-def get_data(id):
-    doc = db.collection('data').document(id).get()
-    if doc.exists:
-        return jsonify(doc.to_dict()), 200
+@app.route('/data/<data_id>', methods=['GET'])
+def get_data(data_id):
+    # Query Firestore to find a document that matches the "id" field
+    docs = db.collection('data').where('id', '==', data_id).stream()
+    
+    # Initialize an empty list to store matching documents
+    matching_docs = []
+
+    # Iterate through the query results
+    for doc in docs:
+        matching_docs.append(doc.to_dict())
+
+    # Check if any matching documents were found
+    if matching_docs:
+        return jsonify(matching_docs), 200
     else:
         return jsonify({'message': 'Data not found'}), 404
+
 
 @app.route('/data', methods=['GET'])
 def get_all_data():
