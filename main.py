@@ -132,7 +132,7 @@ def create_data():
         return jsonify({'error': 'Image files not provided'}), 400
 
     # Save images in the 'images' folder
-    save_path = os.path.join(UPLOAD_FOLDER, 'images')
+    save_path = UPLOAD_FOLDER
 
     # Create the 'images' folder if it doesn't exist
     if not os.path.exists(save_path):
@@ -264,7 +264,7 @@ def update_data(id):
 
     data_type = request.form['type']
     data_class = request.form['class']
-    save_path = os.path.join(UPLOAD_FOLDER, data_type, data_class)
+    save_path = UPLOAD_FOLDER
 
     data = {
         'type': data_type,
@@ -331,10 +331,10 @@ def delete_data(id):
     
 @app.route('/images/<filename>', methods=['GET'])
 def get_image_by_filename(filename):
-    image_path = os.path.join(UPLOAD_FOLDER, 'images', filename)  # Assuming the images are stored in the 'images' folder
+    image_path = os.path.join(UPLOAD_FOLDER, filename)  # Assuming the images are stored in the 'images' folder
 
     if os.path.isfile(image_path):
-        return send_from_directory(os.path.join(UPLOAD_FOLDER, 'images'), filename)
+        return send_from_directory(os.path.join(UPLOAD_FOLDER), filename)
     else:
         return jsonify({'error': 'Image not found'}), 404
 
